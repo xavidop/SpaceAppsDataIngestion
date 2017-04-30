@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:twitter="http://www.mulesoft.org/schema/mule/twitter" xmlns:slack="http://www.mulesoft.org/schema/mule/slack" xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/current/mule-quartz.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/slack http://www.mulesoft.org/schema/mule/slack/current/mule-slack.xsd
+http://www.mulesoft.org/schema/mule/twitter http://www.mulesoft.org/schema/mule/twitter/current/mule-twitter.xsd">
+    <slack:config-type name="Slack__Connection_Managament_type_strategy" 
+    	accessToken="xoxp-176594797124-176638376341-177353162758-f7f3a9e2dbe2ef7e7375304d808b9cbe" 
+    	doc:name="Slack: Connection Managament type strategy"/>
+    <twitter:config name="Twitter__Configuration" 
+    	accessKey="858049028327604224-UVI6aXH46K8jSyGHQrINsDREFukGlX7" 
+    	accessSecret="LelOs4WPAjDXB2hgqW96cs0Adsq8M7rU6gk3tYEzQqSMI" 
+    	consumerKey="Wvq72TeX7vWgdXvYm3KMnTFbd" 
+    	consumerSecret="8I2wxacsdu60d3af5Bgcc56NCFlx3raz5XFSzwDNVbhYzzNVUp" 
+    	doc:name="Twitter: Configuration"/>
+    <flow name="cronAyuntamiento">
+    	 <quartz:inbound-endpoint 
+        doc:name="Quartz" 
+        jobName="CronJobSchedule" 
+        repeatInterval="60000" responseTimeout="10000">                   
+        
+        <quartz:event-generator-job>
+		</quartz:event-generator-job>
+		</quartz:inbound-endpoint>
+        <component class="com.nexus.ayuntamiento.downloader.AyuntamientoDownloader" doc:name="Java"/>
+    
+    
+    </flow>
+    
+    
+    <flow name="cronNumcoches">
+    	 <quartz:inbound-endpoint 
+        doc:name="Quartz" 
+        jobName="CronJobScheduleNumCoches" 
+        repeatInterval="60000" responseTimeout="10000">                   
+        
+        <quartz:event-generator-job>
+		</quartz:event-generator-job>
+		</quartz:inbound-endpoint>
+        <component class="com.nexus.ayuntamiento.downloader.NumCochesDownloader" doc:name="Java"/>
+        <slack:post-message config-ref="Slack__Connection_Managament_type_strategy" channelId="C55RTPNSU" iconURL="https://scontent-mad1-1.xx.fbcdn.net/v/t1.0-9/18157308_197654454078670_2023259623549863642_n.jpg?oh=ab53f0249d6bdc65d5dff3551e600ea2&amp;oe=59870218" username="Alerta Trafico" message="#[payload]" doc:name="Slack"/>
+    
+    
+    </flow>
+    
+    <flow name="cronAyuntamientoTwitter">
+    	 <quartz:inbound-endpoint 
+        doc:name="Quartz" 
+        jobName="CronJobScheduleTwitter" 
+        repeatInterval="7200000" responseTimeout="10000">                   
+        
+        <quartz:event-generator-job>
+		</quartz:event-generator-job>
+		</quartz:inbound-endpoint>
+        <component class="com.nexus.ayuntamiento.downloader.AyuntamientoDownloaderTwitter" doc:name="Java"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <twitter:update-status config-ref="Twitter__Configuration" status="#[payload]" doc:name="Twitter"/>
+    
+    
+    </flow>
+    
+</mule>
