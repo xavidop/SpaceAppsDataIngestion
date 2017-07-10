@@ -10,4 +10,4 @@ jdk:
 
 script:
   # Unit and integration tests are run
-  - mvn clean verify
+  - mvn clean install
