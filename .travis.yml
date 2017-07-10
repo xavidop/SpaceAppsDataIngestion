@@ -2,6 +2,7 @@
 # @link https://travis-ci.org/
 
 # Using Java for the project
+before_script: cd nexus-city-data-consumer
 language: java
 jdk:
   - oraclejdk8
